@@ -23,7 +23,7 @@ public class App {
             }
         };
     }
-
+    
     public static void main(String[] args) {
         HashMap<String, String> configurazione = configurazioneBase();
         HashMap<String, File> hostMap = hostMapBase();

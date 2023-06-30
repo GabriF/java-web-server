@@ -92,9 +92,18 @@ public class HttpI extends Http {
         }
 
         File rootDir = hostMapping.get(host);
+        if (rootDir == null) {
+            log("l'host richiesto non esiste");
+            badRequest();
+            return null;
+        }
+
         File risorsa = new File(rootDir.getAbsolutePath() + risorsaRichiesta);
 
         log("Richiesta risorsa " + risorsa.getAbsolutePath(), 2);
+
+        if (risorsa.isDirectory())
+            risorsa = new File(risorsa.getAbsolutePath() + "/index.html");
 
         if (!risorsa.exists()) {
             log("risorsa richiesta non esistente");

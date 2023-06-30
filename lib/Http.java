@@ -125,17 +125,10 @@ abstract public class Http {
         }
     }
 
+
+    // estrae il metodo ed esegue la richiesta
     public void eseguiRichiesta() {
         log("esecuzione richiesta");
-
-        // controlla che il campo host sia presente e che questo sia effettivamente
-        // previsto
-        HashMap<String, String> headerRichiesta = estraiHeader(richiesta);
-        String host = headerRichiesta.get("host");
-        if (host == null || (!hostMapping.containsKey(host))) {
-            badRequest();
-            return;
-        }
 
         String metodo = estraiMetodo(richiesta);
 
@@ -232,7 +225,7 @@ abstract public class Http {
         String[] righe = richiesta.split("\n");
         URI uri = new URI(righe[0].split(" ")[1]);
 
-        return uri.getPath();
+        return uri.getPath(); // esegue l'encoding dell'URI
     }
 
     protected final static String estraiVersioneHttp(String richiesta) {
@@ -250,7 +243,7 @@ abstract public class Http {
         for (int i = 1; i < righe.length && (!fineHeader); i++) {
             String riga = righe[i];
             String[] splitRiga = riga.split(": ", 2); // Split sulla riga su ': ' con limite 2 per evitare di includere
-                                                      // eventuali caratteri : presenti nel valore
+                                                      // eventuali caratteri ':' presenti nel valore
 
             String nome = splitRiga[0];
             String valore = splitRiga[1];
