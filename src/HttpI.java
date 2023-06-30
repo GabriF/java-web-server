@@ -102,9 +102,6 @@ public class HttpI extends Http {
 
         log("Richiesta risorsa " + risorsa.getAbsolutePath(), 2);
 
-        if (risorsa.isDirectory())
-            risorsa = new File(risorsa.getAbsolutePath() + "/index.html");
-
         if (!risorsa.exists()) {
             log("risorsa richiesta non esistente");
             notFound();
@@ -117,7 +114,13 @@ public class HttpI extends Http {
     // Determina MIME type risorsa e se esso coincide con quello richiesto
     // ritorna null se si sono verificati degli errori
     private String calcolaMime(File risorsa) {
-        String mimeTypeRisposta = URLConnection.guessContentTypeFromName(risorsa.getName());
+        String mimeTypeRisposta = "";
+        if (risorsa.isDirectory()) {
+            mimeTypeRisposta = "text/html";
+        } else {
+            mimeTypeRisposta = URLConnection.guessContentTypeFromName(risorsa.getName());
+        }
+
         HashMap<String, String> headerRichiesta = estraiHeader(richiesta);
         String mimeTypeRichiesti = headerRichiesta.get("accept");
 
@@ -143,7 +146,38 @@ public class HttpI extends Http {
         return mimeTypeRisposta;
     }
 
+    private byte[] listaDirectory(File dir) {
+        final String TEMPLATE_AGGIUNGI = "<p><a href=%url%>%nome%</a></p>";
+
+        String pagina = "";
+
+        String urlRichiesta;
+        try {
+            urlRichiesta = estraiRisorsaRichiesta(richiesta);
+        } catch (URISyntaxException e) {
+            badRequest();
+            return null;
+        }
+
+        for (File f : dir.listFiles()) {
+            String nomeFile = f.getName();
+            String url = urlRichiesta;
+            if (!url.endsWith("/")) {
+                url += "/";
+            }
+            url += nomeFile;
+
+            pagina += TEMPLATE_AGGIUNGI.replaceAll("%url%", url).replaceAll("%nome%", nomeFile);
+            log(pagina);
+        }
+
+        return pagina.getBytes();
+    }
+
     private byte[] leggiRisorsa(File risorsa) {
+        if (risorsa.isDirectory())
+            return listaDirectory(risorsa);
+
         byte[] rawBody = null;
         try {
             rawBody = Files.readAllBytes(risorsa.toPath());
