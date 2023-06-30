@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,6 +97,7 @@ abstract public class Http {
 
         try {
             OutputStream out = connessione.getOutputStream();
+            
             out.write(stato);
             out.write(NEW_LINE_BYTE);
             out.write(header);
@@ -225,11 +228,11 @@ abstract public class Http {
         return metodo;
     }
 
-    protected final static String estraiRisorsaRichiesta(String richiesta) {
+    protected final static String estraiRisorsaRichiesta(String richiesta) throws URISyntaxException {
         String[] righe = richiesta.split("\n");
-        String metodo = righe[0].split(" ")[1];
+        URI uri = new URI(righe[0].split(" ")[1]);
 
-        return metodo;
+        return uri.getPath();
     }
 
     protected final static String estraiVersioneHttp(String richiesta) {

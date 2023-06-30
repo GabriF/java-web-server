@@ -1,4 +1,5 @@
 import java.net.Socket;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -73,7 +74,14 @@ public class HttpI extends Http {
     // ritorna null in caso di errore
     private File calcolaRisorsa() {
         // Calcolo percorso finale risorsa e controllo che essa esista
-        String risorsaRichiesta = estraiRisorsaRichiesta(richiesta);
+        String risorsaRichiesta;
+        try {
+            risorsaRichiesta = estraiRisorsaRichiesta(richiesta);
+        } catch (URISyntaxException e) {
+            badRequest();
+            log("errore durante l'encoding dell'URI richiesto");
+            return null;
+        }
 
         HashMap<String, String> headerRichiesta = estraiHeader(richiesta);
         String host = headerRichiesta.get("host");
